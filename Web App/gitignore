@@ -1,0 +1,4 @@
+DATANVIfinal
+*.pyc
+.DS_Store
+.env
