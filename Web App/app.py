@@ -50,6 +50,9 @@ colors = {'Western Europe': 'rgb(5, 169, 230)',
 
 # my_raceplot = barplot(top50,  item_column='country', value_column='happiness_score', time_column='year', item_color=colors)
 
+writeupbar= "     For the past 6 years, Western Europe produces the happiest countries " \
+            "in the world and the majority of the top " \
+            "50 also come from western countries or those of the developed countries"
 top50['color'] = top50['region'].map(colors)
 
 counts = []
@@ -103,7 +106,12 @@ choro_happy = px.choropleth(whrdf,
                             projection="kavrayskiy7",
                             range_color=[whrdf['happiness_score'].min(), whrdf['happiness_score'].max()])
 
-choro_happy.update_layout(height=1000, margin={"r":0,"t":0,"l":0,"b":0})
+choro_happy.update_layout(autosize=False,
+                          width=1000,
+                          height=650,
+                          margin={"r":0,"t":0,"l":0,"b":0},
+                          paper_bgcolor="rgb(246, 250, 239)",
+                          plot_bgcolor="rgb(246, 250, 239)")
 
 factors = []
 factors.append({"label": "Influence of GDP on Happiness Score", "value": "gdp_hscore"})
@@ -124,7 +132,9 @@ choro_factor = px.choropleth(whrdf,
                              projection="kavrayskiy7",
                              range_color=[whrdf['gdp_hscore'].min(), whrdf['gdp_hscore'].max()])
 
-choro_factor.update_layout(height=1000, margin={"r":0,"t":0,"l":0,"b":0})
+choro_factor.update_layout(autosize=True,
+                           margin={"r":0,"t":0,"l":0,"b":0,"pad":4,"autoexpand":True},
+                           paper_bgcolor="rgb(246, 250, 239)")
 
 categories = ['GDP','Life Expectancy','Freedom',
               'Generosity', 'Corruption', 'GDP']
@@ -229,7 +239,7 @@ radar.update_layout(
       visible=True,
       range=[0, 1.5]
     )),
-  showlegend=True, height=700, margin={"r":0,"t":0,"l":0,"b":0}
+  showlegend=True, height=700, margin={"r":0,"t":0,"l":25,"b":0}
 )
 
 names = ['Happiness Score', 'GDP Influence', 'Life Expectancy Influence', 'Freedom Influence',
@@ -273,76 +283,112 @@ layout = go.Layout(
 
 corr_heatmap=go.Figure(data=[heat], layout=layout)
 
-app.layout = html.Div(className='container', children=[
-    html.H1(children="WORLD HAPPINESS REPORT"),
-    html.Div(className="row", children=[
-        html.H2(children="How many top happiest countries would you like to see?"),
-        html.Div(className="col-8", children=[
-            dcc.Dropdown(
-                id="topdropdown",
-                options=counts
-            )
+app.layout = html.Div(className="mainContainer", children=[
+    html.Section(className="headercontainer"),
+    html.Section(className="container1", children=[
+        html.Div(className="write-up", children=[
+            html.Div(className="card border-secondary mb-3", children=[
+                html.Div(className="card-header", children=[
+                    html.Div(className="card-text",children="How many top happiest countries would you like to see?"),
+                    html.Div(className="nav-item dropdown", children=[
+                            dcc.Dropdown(
+                                id="topdropdown",
+                                options=counts
+                            )
+                    ])
+                ]),
+                html.Div(className="card-body", children=[
+                    html.P(className="slogan1", children="Western Europe, the happiest region on earth!"),
+                    html.P(className="paragraph", children=writeupbar)
+                ])
+             ])
         ]),
-        html.Div(className="col-9", children=[
-            dcc.Graph(
-                id="top-25-bar-race",
-                figure=top50race
-            )
-        ])
-    ]),
-    html.H2(children="Choropleth Map"),
-    html.H3(children="Happiness Score"),
-    html.Div(className="row", children=[
-        html.Div(className="col-12", children=[
+        html.Div(className="graph", children=[
+            html.Div(className="barchartrace", children=[
+                    dcc.Graph(
+                        id="top-25-bar-race",
+                        figure=top50race
+                     )
+                 ])
+            ])
+        ]),
+    html.Section(className="container2", children=[
+        html.Div(className="choro-happy", children=[
             dcc.Graph(
                 id="choropleth-map-happy",
                 figure=choro_happy
-            )
+             )
         ])
     ]),
-    html.H3(children="Factors Influencing Happiness Scores"),
-    html.Div(className="row", children=[
-        html.Div(className="col-11", children=[
-            dcc.Dropdown(
-                id="factor-radio",
-                options=factors
-            )
+    html.Section(className="container3", children=[
+        html.Div(className="write-up-factors", children=[
+            html.Div(className="card border-secondary mb-3", children=[
+                html.Div(className="card-header", children=[
+                    html.Div(className="card-text", children="What would you like to see?"),
+                    html.Div(className="choro-inf-dropdown", children=[
+                        dcc.Dropdown(
+                            id="factor-radio",
+                            options=factors
+                        )
+                    ])
+                ]),
+                html.Div(className="card-body", children=[
+                    html.P(className="paragraph-factors", children=writeupbar)
+                ])
+            ])
         ]),
-    ]),
-    html.Div(className="row", children=[
-        html.Div(className="col-12", children=[
-            dcc.Graph(
-                id="choropleth-map-factor",
-                figure=choro_factor
-            )
+        html.Div(className="graph-factors", children=[
+                dcc.Graph(
+                    id="choropleth-map-factor",
+                    figure=choro_factor
+                )
         ])
     ]),
-    html.H2(children="Radar Chart"),
-    html.Div(className="row", children=[
-        html.Div(className="col-13", children=[
-            dcc.Graph(
-                id="radar-factor",
-                figure=radar
-            )
+    html.Section(className="container4", children=[
+        html.Div(className="write-up-radar", children=[
+            html.Div(className="card border-secondary mb-3", children=[
+                html.Div(className="card-header", children=[
+                    html.Div(className="card-text", children="What year you like to see?"),
+                    html.Div(className="radarslider", children=[
+                        dcc.Slider(
+                            id="radar-slider",
+                            min=2015,
+                            max=2020,
+                            step=None,
+                            marks={2015: '2015',
+                                   2016: '2016',
+                                   2017: '2017',
+                                   2018: '2018',
+                                   2019: '2019',
+                                   2020: '2020'},
+                            value=6
+                        )
+                    ])
+                ]),
+                html.Div(className="card-body", children=[
+                    html.P(className="paragraph-factors", children=writeupbar)
+                ])
+            ])
         ]),
-        html.Div(className="col-14", children=[
-            dcc.Slider(
-                id="radar-slider",
-                min=2015,
-                max=2020,
-                step=None,
-                marks={2015: '2015',
-                       2016: '2016',
-                       2017: '2017',
-                       2018: '2018',
-                       2019: '2019',
-                       2020: '2020'},
-                value=6
-            )
+        html.Div(className="graph-radar", children=[
+                    dcc.Graph(
+                        id="radar-factor",
+                        figure=radar
+                    )
         ])
     ]),
-    html.Div(className="row", children=[
-        html.Div(className="col-15", children=[
+    html.Section(className="container5", children=[
+        html.Div(className="write-up-corr", children=[
+            html.Div(className="card border-secondary mb-3", children=[
+                html.Div(className="card-header", children=[
+                    html.Div(className="card-text", children="[iNSERT tITLE PLS]")
+                ]),
+                html.Div(className="card-body", children=[
+                    html.P(className="paragraph-factors", children=writeupbar)
+                ])
+            ])
+        ]),
+        html.Div(className="graph-corr", children=[
             dcc.Graph(
                 id="heatmap",
                 figure=corr_heatmap
@@ -356,6 +402,7 @@ app.layout = html.Div(className='container', children=[
     Output('top-25-bar-race', 'figure'),
     Input('topdropdown', 'value')
 )
+
 def update_barrace_graph(selected_count):
     if selected_count is None:
         #top 25
@@ -394,17 +441,18 @@ def update_barrace_graph(selected_count):
 
     top50race.update_layout(
         autosize=False,
-        width=1300,
-        height=900,
+        width=1000,
+        height=650,
         margin=dict(
             l=50,
             r=50,
-            b=100,
+            b=50,
             t=100,
             pad=4
         ),
-
-        paper_bgcolor="rgb(223, 226, 219)",
+        title_font_family="Franklin Gothic",
+        title_font_size=40,
+        paper_bgcolor="white",
     )
 
     return top50race
@@ -424,6 +472,7 @@ def update_chorofactor_graph(selected_factor):
                                      animation_frame="year",
                                      projection="kavrayskiy7",
                                      range_color=[whrdf['gdp_hscore'].min(), whrdf['gdp_hscore'].max()])
+
     else:
         choro_factor = px.choropleth(whrdf,
                                      locations="iso_a3",
@@ -432,7 +481,9 @@ def update_chorofactor_graph(selected_factor):
                                      animation_frame="year",
                                      projection="kavrayskiy7",
                                      range_color=[whrdf[selected_factor].min(), whrdf[selected_factor].max()])
-
+    choro_factor.update_layout(autosize=True,
+                               margin={"r": 0, "t": 0, "l": 0, "b": 0, "pad": 4, "autoexpand": True},
+                               paper_bgcolor="rgb(246, 250, 239)")
     return choro_factor
 
 @app.callback(
@@ -495,14 +546,6 @@ def update_radarfactor_graph(selected_year):
             name='Western Europe'
         ))
 
-        radar.update_layout(
-            polar=dict(
-                radialaxis=dict(
-                    visible=True,
-                    range=[0, 1.5]
-                )),
-            showlegend=True, height=700, margin={"r":0,"t":0,"l":0,"b":0}
-        )
     else:
         radaryear = radarlist
         if selected_year == 2015:
@@ -571,14 +614,15 @@ def update_radarfactor_graph(selected_year):
             name='Western Europe'
         ))
 
-        radar.update_layout(
-            polar=dict(
-                radialaxis=dict(
-                    visible=True,
-                    range=[0, 1.5]
-                )),
-            showlegend=True, height=700, margin={"r":0,"t":0,"l":0,"b":0}
-        )
+    radar.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 1.5]
+            )),
+        showlegend=True, height=700,
+        margin={"r": 0, "t": 0, "l": 25, "b": 0}
+    )
 
     return radar
 

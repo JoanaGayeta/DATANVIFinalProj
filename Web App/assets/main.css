@@ -1,0 +1,151 @@
+.mainContainer {
+    margin: 0;
+    background-color: white;
+}
+
+.headercontainer{
+    background-image: url("images/headertest.png");
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    flex-direction: column;
+    width : 100%;
+    height: 800px;
+}
+
+.container1 {
+    margin: 0 auto;
+    background-size: contain;
+    padding-bottom: 25px;
+    padding-left: 75px;
+    padding-right: 75px;
+    padding-top: 150px;
+    content: "";
+    display: table;
+    clear: both;
+    background-image: url("images/bgcont1.png");
+    background-repeat: no-repeat;
+}
+.cont1-title{
+    text-align: center;
+    background-color:
+
+}
+.write-up{
+    float: left;
+    width: 25%;
+    margin-top: 25px;
+}
+.card-text{
+    font-size:20px;
+}
+
+.slogan1{
+    text-align: center;
+    font-size: 25px;
+    font-weight: 20000;
+    color: rgb(92, 171, 219);
+}
+
+.graph{
+    float: left;
+    width: 75%;
+    padding-left: 30px;
+    margin: auto;
+}
+
+.barchartrace{
+    padding-top: 25px;
+    width: 100%;
+}
+
+.container2 {
+    background-size: cover;
+    padding-bottom: 25px;
+    padding-left: 300px;
+    padding-right: 50px;
+    padding-top: 150px;
+    content: "";
+    clear: both;
+    background-image: url("images/bgcont2.png");
+    background-repeat: no-repeat;
+}
+.choro-happy{
+    padding-top: 10px;
+}
+
+
+.container3 {
+    margin: 0 auto;
+    background-size: cover;
+    padding-bottom: 25px;
+    padding-left: 75px;
+    padding-right: 75px;
+    padding-top: 150px;
+    content: "";
+    display: table;
+    clear: both;
+    background-image: url("images/bgcont3.png");
+    background-repeat: no-repeat;
+
+}
+.write-up-factors{
+    float: left;
+    width: 35%;
+    margin-top: 25px;
+}
+.graph-factors{
+    float: left;
+    width: 65%;
+    margin: auto;
+}
+
+.container4 {
+    margin: 0 auto;
+    background-size: cover;
+    padding-bottom: 25px;
+    padding-left: 75px;
+    padding-right: 75px;
+    padding-top: 150px;
+    content: "";
+    display: table;
+    clear: both;
+    background-color: coral;
+    background-repeat: no-repeat;
+}
+
+.write-up-radar{
+    float: left;
+    width: 35%;
+    margin-top: 25px;
+}
+.graph-radar{
+    float: left;
+    width: 65%;
+    padding-left: 30px;
+}
+.container5 {
+    margin: 0 auto;
+    background-size: cover;
+    padding-bottom: 25px;
+    padding-left: 75px;
+    padding-right: 75px;
+    padding-top: 150px;
+    content: "";
+    display: table;
+    clear: both;
+    background-color: blue;
+    background-repeat: no-repeat;
+}
+
+.write-up-corr{
+    float: left;
+    width: 35%;
+    margin-top: 25px;
+}
+.graph-corr{
+    float: left;
+    width: 65%;
+    padding-left: 30px;
+}
