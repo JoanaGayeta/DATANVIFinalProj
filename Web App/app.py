@@ -11,7 +11,7 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
-from raceplotly.plots import barplot
+from raceplotly_happiness.plots import barplot
 
 
 #	external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -26,7 +26,7 @@ external_stylesheets = [ #'https://codepen.io/chriddyp/pen/bWLwgP.css',
 
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-
+server = app.server
 # assume you have a "long-form" data frame
 # see https://plotly.com/python/px-arguments/ for more options
 # df = pd.DataFrame({
@@ -49,10 +49,22 @@ colors = {'Western Europe': 'rgb(5, 169, 230)',
           'Sub-Saharan Africa': 'rgb(57, 240, 119)'}
 
 # my_raceplot = barplot(top50,  item_column='country', value_column='happiness_score', time_column='year', item_color=colors)
+introparagraph = "Happiness is a subjective matter which is tricky to quantify," \
+                 " but it is a key emotion in understanding people. While this would" \
+                 " enable us to partially determine the possible key indicators of people’s " \
+                 "happiness, such knowledge could aid in policy-making, allowing it to be much" \
+                 " more effective and streamlined towards what would lead to a generally happy" \
+                 " population. Through a generally happy population, it is hoped that productivity" \
+                 " would be boosted as well."
+writeupbar = "For the past 6 years, Western Europe is home to the happiest countries " \
+             "in the world. The majority of the top 50 happiest countries also come " \
+             "from western and developed regions (i.e., Latin America and the Caribbean" \
+             ", North America and ANZ)."
 
-writeupbar= "     For the past 6 years, Western Europe produces the happiest countries " \
-            "in the world and the majority of the top " \
-            "50 also come from western countries or those of the developed countries"
+writeupcorr= "All of the factors have a strong to very strong positive correlation " \
+             "except when the actual crime rate for each country is involved. With this, " \
+             "we can say that as the crime rate of a country increases, the values of " \
+             "several variables tend to decrease with a strength of weak to medium."
 top50['color'] = top50['region'].map(colors)
 
 counts = []
@@ -107,8 +119,8 @@ choro_happy = px.choropleth(whrdf,
                             range_color=[whrdf['happiness_score'].min(), whrdf['happiness_score'].max()])
 
 choro_happy.update_layout(autosize=False,
-                          width=1000,
-                          height=650,
+                          width=900,
+                          height=500,
                           margin={"r":0,"t":0,"l":0,"b":0},
                           paper_bgcolor="rgb(246, 250, 239)",
                           plot_bgcolor="rgb(246, 250, 239)")
@@ -132,9 +144,11 @@ choro_factor = px.choropleth(whrdf,
                              projection="kavrayskiy7",
                              range_color=[whrdf['gdp_hscore'].min(), whrdf['gdp_hscore'].max()])
 
-choro_factor.update_layout(autosize=True,
+choro_factor.update_layout(autosize=False,
+                           width=900,
+                           height=500,
                            margin={"r":0,"t":0,"l":0,"b":0,"pad":4,"autoexpand":True},
-                           paper_bgcolor="rgb(246, 250, 239)")
+                           paper_bgcolor="rgb(255, 255, 255)")
 
 categories = ['GDP','Life Expectancy','Freedom',
               'Generosity', 'Corruption', 'GDP']
@@ -151,7 +165,7 @@ radardf2020 = radardf[radardf['year'] == 2020].groupby(by=["region"]).mean()
 
 radardflist = radardf[['region', 'gdp_hscore', 'lifeexp_hscore', 'freedom_hscore',
                        'generosity_hscore', 'corruption_hscore']].groupby(by=["region"]).mean()
-print(radardflist.head(10))
+#print(radardflist.head(10))
 
 # df = pd.DataFrame(products, columns= ['Product', 'Price'])
 
@@ -233,14 +247,15 @@ radar.add_trace(go.Scatterpolar(
 ))
 
 
-radar.update_layout(
-  polar=dict(
-    radialaxis=dict(
-      visible=True,
-      range=[0, 1.5]
-    )),
-  showlegend=True, height=700, margin={"r":0,"t":0,"l":25,"b":0}
-)
+radar.update_layout(polar=dict(radialaxis=dict(visible=True,range=[0, 1.5])),
+                    showlegend=True, height=200, margin={"r":0,"t":0,"l":25,"b":0},
+                    paper_bgcolor="rgb(246, 250, 239)",
+                    legend=dict(
+                        yanchor="top",
+                        xanchor="left"
+
+                    )
+                    )
 
 names = ['Happiness Score', 'GDP Influence', 'Life Expectancy Influence', 'Freedom Influence',
          'Generosity Influence', 'Corruption Influence', 'Actual Crime', 'Actual GDP', 'Actual Life Expectancy']
@@ -266,7 +281,7 @@ heat = go.Heatmap(
     zmax = 1,
     xgap = 1, # Sets the horizontal gap (in pixels) between bricks
     ygap = 1,
-    colorscale = 'YlGnBu'
+    colorscale = 'Tropic'
 )
 
 title = 'Correlation Matrix'
@@ -283,26 +298,90 @@ layout = go.Layout(
 
 corr_heatmap=go.Figure(data=[heat], layout=layout)
 
+parfactors="For the year 2017, the influence of GDP on happiness " \
+           "score peaked on most countries around the" \
+           "world. The succeeding years however, it dropped. " \
+           "There is little to no changes in the influence " \
+           "in most African countries and some Asian countries."
+
+
 app.layout = html.Div(className="mainContainer", children=[
-    html.Section(className="headercontainer"),
-    html.Section(className="container1", children=[
-        html.Div(className="write-up", children=[
-            html.Div(className="card border-secondary mb-3", children=[
-                html.Div(className="card-header", children=[
-                    html.Div(className="card-text",children="How many top happiest countries would you like to see?"),
-                    html.Div(className="nav-item dropdown", children=[
+    html.Section(id="headercontainer"),
+    html.Section(id="introcontainer", children=[
+        html.Div(className="introDiv", children=[
+            html.P(children=introparagraph),
+        ]),
+        html.Div(className="button1", children=[
+            html.A(className="toC1", href="#container1", children=[
+                html.Img(className="scrolly", src="assets\images\scrolly.gif")
+            ])
+        ])
+    ]),
+    html.Section(id="container1", children=[
+        html.Div(className="left1", children=[
+            html.Div(className="write-up", children=[
+                html.Div(className="card border-secondary mb-3", children=[
+                    html.Div(className="card-header", children=[
+                        html.Div(className="card-text",
+                                 children="How many top happiest countries would you like to see?"),
+                        html.Div(className="nav-item dropdown", children=[
                             dcc.Dropdown(
                                 id="topdropdown",
                                 options=counts
                             )
+                        ])
+                    ]),
+                    html.Div(className="card-body", children=[
+                        html.P(className="slogan1", children="Western Europe, the happiest region on earth!"),
+                        html.P(className="paragraph", children=writeupbar)
                     ])
-                ]),
-                html.Div(className="card-body", children=[
-                    html.P(className="slogan1", children="Western Europe, the happiest region on earth!"),
-                    html.P(className="paragraph", children=writeupbar)
                 ])
-             ])
+            ]),
+            html.Div(className="legend", children=[
+                html.P(className="legendTitle", children="Regions"),
+                html.Table(className="legendTable", children=[
+                    html.Tbody(className="tableBody", children=[
+                        html.Tr(className="cee", children=[
+                            html.Td(className="ceeColor"),
+                            html.Td(className="tdTitle", children="Central and Eastern Europe")
+                        ]),
+                        html.Tr(className="ea", children=[
+                            html.Td(className="eaColor"),
+                            html.Td(className="tdTitle", children="East Asia")
+                        ]),
+                        html.Tr(className="sea", children=[
+                            html.Td(className="seaColor"),
+                            html.Td(className="tdTitle", children="Southeast Asia")
+                        ]),
+                        html.Tr(className="ssa", children=[
+                            html.Td(className="ssaColor"),
+                            html.Td(className="tdTitle", children="Sub-Saharan Africa")
+                        ]),
+                        html.Tr(className="cis", children=[
+                            html.Td(className="cisColor"),
+                            html.Td(className="tdTitle", children="Commonwealth of Independent States")
+                        ]),
+                        html.Tr(className="we", children=[
+                            html.Td(className="weColor"),
+                            html.Td(className="tdTitle", children="Western Europe")
+                        ]),
+                        html.Tr(className="naanz", children=[
+                            html.Td(className="naanzColor"),
+                            html.Td(className="tdTitle", children="North America and ANZ")
+                        ]),
+                        html.Tr(className="mena", children=[
+                            html.Td(className="menaColor"),
+                            html.Td(className="tdTitle", children="Middle East and North Africa")
+                        ]),
+                        html.Tr(className="lac", children=[
+                            html.Td(className="lacColor"),
+                            html.Td(className="tdTitle", children="Latin America and Carribean")
+                        ])
+                    ])
+                ])
+            ])
         ]),
+
         html.Div(className="graph", children=[
             html.Div(className="barchartrace", children=[
                     dcc.Graph(
@@ -310,17 +389,40 @@ app.layout = html.Div(className="mainContainer", children=[
                         figure=top50race
                      )
                  ])
+            ]),
+        html.Div(className="button2", children=[
+            html.A(className="toC2", href="#container2", children=[
+                html.Img(className="scrolly2", src="assets\images\scrolly2.gif")
+            ])
+        ])
+    ]),
+    html.Section(id="container2", children=[
+        html.Div(className="write-up-happy", children=[
+            html.Div(className="card border-secondary mb-3", children=[
+                html.Div(className="card-header", children=[
+                    html.Div(className="card-text", children=[
+                        html.P(className="disclaimer",children="Disclaimer: The gray-colored countries are missing values.")
+                    ])
+                ]),
+                html.Div(className="card-body", children=[
+                    html.P(className="paragraph", children="In the span of six years, Asian and African countries have low happiness scores. "\
+                                                           "The majority of countries especially in Africa are not that well developed.")
+                ])
             ])
         ]),
-    html.Section(className="container2", children=[
-        html.Div(className="choro-happy", children=[
+        html.Div(className="graph-happy", children=[
             dcc.Graph(
                 id="choropleth-map-happy",
                 figure=choro_happy
              )
+        ]),
+        html.Div(className="button3", children=[
+            html.A(className="toC3", href="#container3", children=[
+                html.Img(className="scrolly", src="assets\images\scrolly.gif")
+            ])
         ])
     ]),
-    html.Section(className="container3", children=[
+    html.Section(id="container3", children=[
         html.Div(className="write-up-factors", children=[
             html.Div(className="card border-secondary mb-3", children=[
                 html.Div(className="card-header", children=[
@@ -333,7 +435,7 @@ app.layout = html.Div(className="mainContainer", children=[
                     ])
                 ]),
                 html.Div(className="card-body", children=[
-                    html.P(className="paragraph-factors", children=writeupbar)
+                    html.P(id="writeupfac", children=parfactors)
                 ])
             ])
         ]),
@@ -342,9 +444,14 @@ app.layout = html.Div(className="mainContainer", children=[
                     id="choropleth-map-factor",
                     figure=choro_factor
                 )
+        ]),
+        html.Div(className="button4", children=[
+            html.A(className="toC4", href="#container4", children=[
+                html.Img(className="scrolly2", src="assets\images\scrolly2.gif")
+            ])
         ])
     ]),
-    html.Section(className="container4", children=[
+    html.Section(id="container4", children=[
         html.Div(className="write-up-radar", children=[
             html.Div(className="card border-secondary mb-3", children=[
                 html.Div(className="card-header", children=[
@@ -366,7 +473,12 @@ app.layout = html.Div(className="mainContainer", children=[
                     ])
                 ]),
                 html.Div(className="card-body", children=[
-                    html.P(className="paragraph-factors", children=writeupbar)
+                    html.P(className="paragraph", children="All regions virtually perceive the "\
+                                                                   "factors that affect their happiness to"\
+                                                                   " be of equal weight. Although having different"\
+                                                                   " values, the pattern is generally the same. "\
+                                                                   "All countries give most importance to their GDP, "\
+                                                                   "while corruption has the least influence.")
                 ])
             ])
         ]),
@@ -375,16 +487,21 @@ app.layout = html.Div(className="mainContainer", children=[
                         id="radar-factor",
                         figure=radar
                     )
+        ]),
+        html.Div(className="button5", children=[
+            html.A(className="toC5", href="#container5", children=[
+                html.Img(className="scrolly", src="assets\images\scrolly.gif")
+            ])
         ])
     ]),
-    html.Section(className="container5", children=[
+    html.Section(id="container5", children=[
         html.Div(className="write-up-corr", children=[
             html.Div(className="card border-secondary mb-3", children=[
                 html.Div(className="card-header", children=[
-                    html.Div(className="card-text", children="[iNSERT tITLE PLS]")
+                    html.Div(className="card-text2", children="Correlation of Factors")
                 ]),
                 html.Div(className="card-body", children=[
-                    html.P(className="paragraph-factors", children=writeupbar)
+                    html.P(className="paragraph", children=writeupcorr)
                 ])
             ])
         ]),
@@ -393,6 +510,22 @@ app.layout = html.Div(className="mainContainer", children=[
                 id="heatmap",
                 figure=corr_heatmap
             )
+        ]),
+        html.Div(className="button6", children=[
+            html.A(className="toC6", href="#conccontainer", children=[
+                html.Img(className="scrolly2", src="assets\images\scrolly2.gif")
+            ])
+        ])
+    ]),
+    html.Section(id="conccontainer", children=[
+        html.Div(className="concDiv", children=[
+            html.P(children="To conclude, all countries around the globe "
+                            "almost share the same sentiments when it comes "
+                            "to the factors that affect their happiness. With "
+                            "GDP and life expectancy being the most influential "
+                            "factors of the happiness score, it can be said that "
+                            "they are indicators of the overall well-being and "
+                            "productiveness of the people."),
         ])
     ])
 ])
@@ -451,7 +584,7 @@ def update_barrace_graph(selected_count):
             pad=4
         ),
         title_font_family="Franklin Gothic",
-        title_font_size=40,
+        title_font_size=30,
         paper_bgcolor="white",
     )
 
@@ -481,10 +614,65 @@ def update_chorofactor_graph(selected_factor):
                                      animation_frame="year",
                                      projection="kavrayskiy7",
                                      range_color=[whrdf[selected_factor].min(), whrdf[selected_factor].max()])
-    choro_factor.update_layout(autosize=True,
+    choro_factor.update_layout(autosize=False,
+                          width=900,
+                          height=500,
                                margin={"r": 0, "t": 0, "l": 0, "b": 0, "pad": 4, "autoexpand": True},
-                               paper_bgcolor="rgb(246, 250, 239)")
+                               paper_bgcolor="rgb(255, 255, 255)")
     return choro_factor
+
+@app.callback(
+    # id, property
+    Output('writeupfac', 'children'),
+    Input('factor-radio', 'value')
+)
+
+def update_factorwriteup(selected_factor):
+    parfactors = ""
+    if selected_factor is None:
+        parfactors = "For the year 2017, the influence of GDP on happiness " \
+           "score peaked on most countries around the " \
+           "world. In the succeeding years however, it dropped. " \
+           "There is little to no changes in the influence " \
+           "in most African countries and some Asian countries."
+    elif selected_factor == 'gdp_hscore':
+        parfactors = "For the year 2017, the influence of GDP on happiness " \
+           "score peaked on most countries around the " \
+           "world. In the succeeding years however, it dropped. " \
+           "There is little to no changes in the influence " \
+           "in most African countries and some Asian countries."
+    elif selected_factor == 'lifeexp_hscore':
+        parfactors= "From the years 2017 to 2019, the influence of life " \
+                    "expectancy on happiness score was slowly rising but " \
+                    "it dropped in the year 2020 because of the pandemic. " \
+                    "African countries tend to have the lowest scores compared to other " \
+                    "countries."
+    elif selected_factor == 'freedom_hscore':
+        parfactors= "In Western and some Asian countries, there is no consistency " \
+                    "in the influence of freedom on happiness score. In African countries, " \
+                    "the influence is consistent throughout the years but the score is low."
+    elif selected_factor == 'generosity_hscore':
+        parfactors= "Throughout the years starting 2015, the countries that have good " \
+                    "scores slowly decreases up until 2020 where we can see that generosity does " \
+                    "not have much influence on the happiness score."
+    elif selected_factor == 'corruption_hscore':
+        parfactors= "Australia, Canada, and some European countries have good influence " \
+                    "of corruption in happiness score while the other countries have little " \
+                    "to no influence."
+    elif selected_factor == 'actual_crime':
+        parfactors= "In terms of consistency, the countries in Latin America and Africa " \
+                    "have the highest crime rate around the world while other countries do not " \
+                    "mainly because western and some asian countries are already developed."
+    elif selected_factor == 'actual_gdp':
+        parfactors= "Western countries have higher GDP than other countries."
+    elif selected_factor == 'actual_lifeexp':
+        parfactors= "From 2015 up to 2019, the life expectancy of most countries specifically " \
+                    "the developed ones are high but in 2020, all of the scores dropped because " \
+                    "of the pandemic."
+    return parfactors
+
+
+
 
 @app.callback(
     # id, property
@@ -621,7 +809,13 @@ def update_radarfactor_graph(selected_year):
                 range=[0, 1.5]
             )),
         showlegend=True, height=700,
-        margin={"r": 0, "t": 0, "l": 25, "b": 0}
+        margin={"r": 0, "t": 0, "l": 25, "b": 0},
+        paper_bgcolor = "rgba(246, 250, 239, 0)",
+        legend=dict(
+            yanchor="top",
+            xanchor="left"
+
+        )
     )
 
     return radar
